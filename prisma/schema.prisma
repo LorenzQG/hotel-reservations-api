@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+	provider = "prisma-client-js"
+}
+
+datasource db {
+	provider = "mysql"
+	url      = env("DATABASE_URL")
+}
+
+model Hotel{
+	id		Int			@id	@default(autoincrement())
+	name	String		@db.VarChar(20)
+	room	Room[]
+}
+
+model Room {
+	id				Int					@id @default(autoincrement())
+	number			Int					@db.Int
+	type			Types				@default(BASICO)
+	size			Int					@db.Int
+	hotel			Hotel				@relation(fields: [hotelId], references: [id])
+	disponivel		Boolean				@default(true)
+	hotelId			Int				
+	reservation		Reservations[]	
+	price			Decimal				@db.Decimal(10, 2)
+}
+
+model User {
+	id				Int					@id	@default(autoincrement())
+	name			String				@db.VarChar(20)
+	email			String				@db.VarChar(50)
+	cpf				String				@db.VarChar(11)
+	password		String	
+	reservation		Reservations[]
+	log				Log[]
+}
+
+model Reservations {
+	id				Int				@id @default(autoincrement())
+	descricao		String			@db.VarChar(255)
+	qtdDias			Int				@db.Int
+	horaEnt			DateTime		@default(now())
+	deleted 		Boolean			@default(false)
+	user			User			@relation(fields: [userId], references: [id])
+	userId			Int
+	room			Room			@relation(fields: [roomId], references: [id])	
+	roomId			Int			
+}
+
+model Log {
+	id           	Int      		@id @default(autoincrement())
+	descricao    	String   		@db.VarChar(60)
+	complemento  	String   		@db.VarChar(255)
+	createdAt    	DateTime 		@default(now())
+	updatedAt    	DateTime 		@updatedAt  
+	user     	 	User  			@relation(fields: [userId], references: [id])
+	userId    	 	Int
+	@@map("logs")
+}
+
+enum Types {
+	BASICO
+	SUIT_BASICA
+	SUIT_LUXO
+}
