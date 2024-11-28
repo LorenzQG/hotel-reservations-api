@@ -10,13 +10,14 @@ generator client {
 
 datasource db {
 	provider = "mysql"
-	url      = env("DATABASE_URL")
+	url      = "mysql://root:password1900@localhost:3306/api_lorenzo"
 }
 
-model Hotel{
+model Hotel{np
 	id		Int			@id	@default(autoincrement())
 	name	String		@db.VarChar(20)
 	room	Room[]
+	reservations Reservations[]
 }
 
 model Room {
@@ -47,6 +48,8 @@ model Reservations {
 	qtdDias			Int				@db.Int
 	horaEnt			DateTime		@default(now())
 	deleted 		Boolean			@default(false)
+	hotelId         Int 		    @db.Int
+	hotel			Hotel			@relation(fields: [hotelId], references: [id])
 	user			User			@relation(fields: [userId], references: [id])
 	userId			Int
 	room			Room			@relation(fields: [roomId], references: [id])	
