@@ -27,6 +27,45 @@ router.get("/", async (req, res) => {
   }
 });
 
+///
+
+router.put("/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { qtdDias } = req.body;
+
+  if (!qtdDias || qtdDias <= 0) {
+    return "A quantidade de dias precisa ser maior que 0.";
+  }
+
+  try {
+    const reservaExistente = await prisma.reservations.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    if (!reservaExistente) {
+      return "Reserva não encontrada.";
+    }
+
+    const reservaAtualizada = await prisma.reservations.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        qtdDias: qtdDias,
+      },
+    });
+
+    return res.status(200).json(reservaAtualizada);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro ao atualizar a reserva." });
+  }
+});
+
+///
+
 router.get("/deleted", async (req, res) => {
   try {
     const reservations = await prisma.reservations.findMany({
