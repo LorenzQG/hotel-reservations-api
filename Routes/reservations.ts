@@ -36,6 +36,9 @@ router.get("/", async (req, res) => {
             price: true,
           },
         },
+        hotel: {
+          select: { id: true, name: true },
+        },
       },
     });
     res.json(reservations);
@@ -45,6 +48,25 @@ router.get("/", async (req, res) => {
 });
 
 ///
+
+// GET ONE
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const reservations = await prisma.reservations.findFirstOrThrow({
+      where: {
+        deleted: false,
+        id: Number(id),
+      },
+    });
+    res.json(reservations);
+  } catch (err) {
+    res.json({ error: "Erro ao buscar as reservas" });
+  }
+});
+
+/////
 
 router.put("/:id", verifyToken, async (req, res): Promise<void> => {
   const { id } = req.params;
@@ -130,9 +152,6 @@ router.post("/", verifyToken, async (req, res) => {
         disponivel: false,
       },
     });
-
-    res.json(reservation);
-    res.json(room);
   } catch (err) {
     res.status(500).json({ error: "Erro ao criar a reserva" });
   }
