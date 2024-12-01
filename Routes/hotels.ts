@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
         name: true,
         room: {
           select: {
+            id: true,
             number: true,
             type: true,
             size: true,
